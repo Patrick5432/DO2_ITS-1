@@ -1,165 +1,72 @@
 import math
-"Task-1"
-print("=" * 20 + "TEST-1" + "=" * 20)
-def CheckMath_taks1(days):
-    print(f"Необходимо {math.ceil(days / 50)} упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения")
+import unittest
 
-test_days = [1, 50, 51, 100, 101, 149, 150, 200, 201]
+# Task 1: 
+def calculate_packs_based_on_days(days):
+    return math.ceil(days / 50)
 
-for days in test_days:
-    print(f"Тест для {days} дней:")
-    CheckMath_taks1(days)
-    print()
-print("=" * 40)
-"""
-1. Для 1 дня: Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-2. Для 50 дней: Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-3. Для 51 дня: Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-4. Для 100 дней: Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-5. Для 101 дня: Необходимо 3 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-6. Для 149 дней: Необходимо 3 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-7. Для 150 дней: Необходимо 3 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-8. Для 200 дней: Необходимо 4 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-9. Для 201 дня: Необходимо 5 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-"""
+# Task 2: 
+def calculate_packs_based_on_weight(weight, days):
+    daily_dose = (weight * 10) / 250
+    daily_dose = round(daily_dose, 1)
+    packs_required = math.ceil((daily_dose * days * 2) / 50)
+    return daily_dose, packs_required
 
-"Task-2"
-print("=" * 20 + "TEST-2" + "=" * 20)
-def CheckMath_task2(weight, days):
+# Task 3: 
+def calculate_packs_with_dosage(dose, weight, days):
+    if dose not in [10, 15]:
+        raise ValueError("Суточная дозировка должна быть 10 или 15 мг/кг")
+    daily_dose = (weight * dose) / 250
+    daily_dose = round(daily_dose, 1)
+    packs_required = math.ceil((daily_dose * days * 2) / 50)
+    return daily_dose, packs_required
 
-    numberPillsOnWeith = (weight * 10) / 250
-    numberPillsOnWeith = round(numberPillsOnWeith, 1)
+# Task 4:
+def analyze_and_calculate(result_analysis, dose, weight, days):
+    alt = None
+    ast = None
+    for line in result_analysis.split("\\n"):
+        if line.startswith("АЛТ"):
+            alt = int(line.split("-")[1].strip())
+        elif line.startswith("АСТ"):
+            ast = int(line.split("-")[1].strip())
+    
+    if alt is None or ast is None:
+        raise ValueError("Некорректный формат анализов")
 
-    print(f"Нужно принимать по {numberPillsOnWeith} таблетки(-e) 2 раза в день")
-    print(f"Необходимо {math.ceil(((numberPillsOnWeith * days) * 2) / 50)} упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения")
+    daily_dose, packs_required = calculate_packs_with_dosage(dose, weight, days)
+    return alt, ast, daily_dose, packs_required
 
-test_cases = [(50, 1), (70, 10), (80, 5), (60, 15), (90, 3)]
 
-for weight, days in test_cases:
-    print(f"Тест для веса {weight} кг и {days} дней:")
-    CheckMath_task2(weight, days)
-    print()
-print("=" * 40)
+class TestMedicationCalculations(unittest.TestCase):
 
-"""
-1. Для веса 50 кг и 1 дня:
-Нужно принимать по 2.0 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-2. Для веса 70 кг и 10 дней:
-Нужно принимать по 2.8 таблетки(-e) 2 раза в день
-Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-3. Для веса 80 кг и 5 дней:
-Нужно принимать по 3.2 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-4. Для веса 60 кг и 15 дней:
-Нужно принимать по 2.4 таблетки(-e) 2 раза в день
-Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-5. Для веса 90 кг и 3 дня:
-Нужно принимать по 3.6 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-"""
+    def test_calculate_packs_based_on_days(self):
+        self.assertEqual(calculate_packs_based_on_days(1), 1)
+        self.assertEqual(calculate_packs_based_on_days(50), 1)
+        self.assertEqual(calculate_packs_based_on_days(51), 2)
+        self.assertEqual(calculate_packs_based_on_days(100), 2)
+        self.assertEqual(calculate_packs_based_on_days(101), 3)
 
-"Taks-3"
-print("=" * 20 + "TEST-3" + "=" * 20)
-def CheckMath_task3(dose, weight, days):
-    if (dose == 10 or dose == 15):
-        numberPillsOnWeith = (weight * dose) / 250
-        numberPillsOnWeith = round(numberPillsOnWeith, 1)
+    def test_calculate_packs_based_on_weight(self):
+        self.assertEqual(calculate_packs_based_on_weight(50, 1), (2.0, 1))
+        self.assertEqual(calculate_packs_based_on_weight(70, 10), (2.8, 2))
+        self.assertEqual(calculate_packs_based_on_weight(80, 5), (3.2, 1))
+        self.assertEqual(calculate_packs_based_on_weight(60, 15), (2.4, 2))
 
-        print(f"Нужно принимать по {numberPillsOnWeith} таблетки(-e) 2 раза в день")
-        print(f"Необходимо {math.ceil(((numberPillsOnWeith * days) * 2) / 50)} упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения")
-    else:
-        print("Суточная дозировка не равна 10 или 15 мг/кг! Остальные дозировки пока не рассчитываются!")
+    def test_calculate_packs_with_dosage(self):
+        self.assertEqual(calculate_packs_with_dosage(10, 50, 1), (2.0, 1))
+        self.assertEqual(calculate_packs_with_dosage(15, 70, 10), (4.2, 2))
+        self.assertEqual(calculate_packs_with_dosage(10, 80, 5), (3.2, 1))
+        with self.assertRaises(ValueError):
+            calculate_packs_with_dosage(20, 50, 1)
 
-test_cases = [(10, 50, 1), (15, 70, 10), (10, 80, 5), (15, 60, 15), (10, 90, 3), (20, 50, 1)]
+    def test_analyze_and_calculate(self):
+        self.assertEqual(analyze_and_calculate("АЛТ-45\\nАСТ-30", 10, 50, 1), (45, 30, 2.0, 1))
+        self.assertEqual(analyze_and_calculate("АЛТ-60\\nАСТ-40", 15, 70, 10), (60, 40, 4.2, 2))
+        self.assertEqual(analyze_and_calculate("АЛТ-50\\nАСТ-35", 10, 80, 5), (50, 35, 3.2, 1))
+        with self.assertRaises(ValueError):
+            analyze_and_calculate("АЛТ-80\\nАСТ-60", 20, 50, 1)
 
-for dose, weight, days in test_cases:
-    print(f"Тест для дозировки {dose} мг/кг, веса {weight} кг и {days} дней:")
-    CheckMath_task3(dose, weight, days)
-    print()
-print("=" * 40)
 
-"""
-1. Для дозировки 10 мг/кг, веса 50 кг и 1 дня:
-Нужно принимать по 2.0 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-2. Для дозировки 15 мг/кг, веса 70 кг и 10 дней:
-Нужно принимать по 4.2 таблетки(-e) 2 раза в день
-Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-3. Для дозировки 10 мг/кг, веса 80 кг и 5 дней:
-Нужно принимать по 3.2 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-4. Для дозировки 15 мг/кг, веса 60 кг и 15 дней:
-Нужно принимать по 4.5 таблетки(-e) 2 раза в день
-Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-5. Для дозировки 10 мг/кг, веса 90 кг и 3 дня:
-Нужно принимать по 3.6 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-6. Для недопустимой дозировки 20 мг/кг:
-Суточная дозировка не равна 10 или 15 мг/кг! Остальные дозировки пока не рассчитываются!
-"""
-
-"Task-4"
-print("=" * 20 + "TEST-4" + "=" * 20)
-def CheckMath_taks4(result_analysis, dose, weight, days):
-    result_analysis = result_analysis.lower()
-
-    result_analysis = result_analysis.split("\\n")
-
-    i = 0
-
-    while(i < len(result_analysis)):
-
-        check = result_analysis[i]
-
-        if (check[0:3] == "алт"):
-            result = check.split("-")
-            result1 = result[1]
-            result1 = result1.split()
-            alt = result1[0]
-        elif (check[0:3] == "аст"):
-            result = check.split("-")
-            result1 = result[1]
-            result1 = result1.split()
-            act = result1[0]
-
-        i = i + 1
-
-    dash = "-" * 50
-    print(dash)
-    print(f"АЛТ - {alt}")
-    print(f"АСТ - {act}")
-    print(dash)
-
-    if (dose == 10 or dose == 15):
-        numberPillsOnWeith = (weight * dose) / 250
-        numberPillsOnWeith = round(numberPillsOnWeith, 1)
-
-        print(f"Нужно принимать по {numberPillsOnWeith} таблетки(-e) 2 раза в день")
-        print(f"Необходимо {math.ceil(((numberPillsOnWeith * days) * 2) / 50)} упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения")
-    else:
-        print("Суточная дозировка не равна 10 или 15 мг/кг! Остальные дозировки пока не рассчитываются!")
-
-test_cases = [("АЛТ-45\\nАСТ-30", 10, 50, 1), ("АЛТ-60\\nАСТ-40", 15, 70, 10), ("АЛТ-50\\nАСТ-35", 10, 80, 5), ("АЛТ-55\\nАСТ-45", 15, 60, 15), ("АЛТ-70\\nАСТ-50", 10, 90, 3), ("АЛТ-80\\nАСТ-60", 20, 50, 1)]
-
-for result_analysis, dose, weight, days in test_cases:
-    print(f"Тест для результатов анализов '{result_analysis}', дозировки {dose} мг/кг, веса {weight} кг и {days} дней:")
-    CheckMath_taks4(result_analysis, dose, weight, days)
-    print()
-
-"""
-1. Для результатов анализов "АЛТ-45\nАСТ-30", дозировки 10 мг/кг, веса 50 кг и 1 дня:
-АЛТ - 45
-АСТ - 30
-Нужно принимать по 2.0 таблетки(-e) 2 раза в день
-Необходимо 1 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-2. Для результатов анализов "АЛТ-60\nАСТ-40", дозировки 15 мг/кг, веса 70 кг и 10 дней:
-АЛТ - 60
-АСТ - 40
-Нужно принимать по 4.2 таблетки(-e) 2 раза в день
-Необходимо 2 упаковка(-ки/-ок) по 50 таблеток (250мг) на весь курс лечения
-3. Для результатов анализов "АЛТ-50\nАСТ-35", дозировки 10 мг/кг, веса 80 кг и 5 дней:
-АЛТ - 50
-АСТ - 35
-Нужно принимать по 3.2 таблетки(-e) 2 раза в день
-"""
+if __name__ == "__main__":
+    unittest.main()
